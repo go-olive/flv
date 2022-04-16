@@ -44,10 +44,11 @@ func (d *demuxer) ReadTag(c *TagCompo) (err error) {
 		return
 	}
 
-	reader := bytes.NewReader(c.TagHeaderRaw[:])
-	if err = binary.Read(reader, binary.BigEndian, &c.TagHeader); err != nil {
-		return
-	}
+	c.TagHeader.TagType = c.TagHeaderRaw[0]
+	c.TagHeader.DataSize = c.TagHeaderRaw[1:4]
+	c.TagHeader.Timestamp = c.TagHeaderRaw[4:7]
+	c.TagHeader.TimestampExtended = c.TagHeaderRaw[7]
+	c.TagHeader.StreamID = c.TagHeaderRaw[8:11]
 
 	if len(c.TagBodyRaw) < int(c.GetDataSize()+4) {
 		c.TagBodyRaw = make([]byte, c.GetDataSize()+4)

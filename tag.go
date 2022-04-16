@@ -29,11 +29,11 @@ type TagCompo struct {
 }
 
 type TagHeader struct {
-	TagType           uint8
-	DataSize          [3]uint8
-	Timestamp         [3]uint8
-	TimestampExtended uint8
-	StreamID          [3]uint8
+	TagType           byte
+	DataSize          []byte
+	Timestamp         []byte
+	TimestampExtended byte
+	StreamID          []byte
 }
 
 func (this *TagHeader) GetDataSize() uint32 {
@@ -43,6 +43,9 @@ func (this *TagHeader) GetDataSize() uint32 {
 }
 
 func (this *TagHeader) GetTimestamp() uint32 {
+	if len(this.Timestamp) != 3 {
+		return 0
+	}
 	realTimestamp := binary.BigEndian.Uint32(append([]uint8{this.TimestampExtended}, []uint8(this.Timestamp[:])...))
 	// log.Printf("start time: %s", time.Unix(int64(fixedTimstamp/1000), 0))
 	return realTimestamp
