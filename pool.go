@@ -1,16 +1,21 @@
 package flv
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/funny/slab"
+)
 
 var (
 	headerCompoPool = sync.Pool{
 		New: func() any { return new(HeaderCompo) },
 	}
-	tagCompoPool = sync.Pool{
-		New: func() any {
-			return new(TagCompo)
-		},
-	}
+	bytesPool = slab.NewChanPool(
+		16,        // The smallest chunk size is 16B.
+		256*1024,  // The largest chunk size is 256KB.
+		2,         // Power of 2 growth in chunk size.
+		1024*1024, // Each slab will be 1MB in size.
+	)
 )
 
 func GetHeaderCompo() *HeaderCompo {
@@ -21,14 +26,10 @@ func (this *HeaderCompo) Put() {
 	headerCompoPool.Put(this)
 }
 
-func GetTagCompo() *TagCompo {
-	return tagCompoPool.Get().(*TagCompo)
+func PutBytes(slice []byte) {
+	bytesPool.Free(slice)
 }
 
-func (this *TagCompo) Put() {
-	if cap(this.TagBodyRaw) > 64<<10 {
-		return
-	}
-	this.TagBodyRaw = this.TagBodyRaw[:0]
-	tagCompoPool.Put(this)
+func GetBytes(s int) []byte {
+	return bytesPool.Alloc(s)
 }

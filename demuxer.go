@@ -50,9 +50,7 @@ func (d *demuxer) ReadTag(c *TagCompo) (err error) {
 	c.TagHeader.TimestampExtended = c.TagHeaderRaw[7]
 	c.TagHeader.StreamID = c.TagHeaderRaw[8:11]
 
-	if len(c.TagBodyRaw) < int(c.GetDataSize()+4) {
-		c.TagBodyRaw = make([]byte, c.GetDataSize()+4)
-	}
+	c.TagBodyRaw = GetBytes(int(c.GetDataSize() + 4))
 
 	if _, err = io.ReadAtLeast(io.LimitReader(d.r, int64(c.GetDataSize()+4)), c.TagBodyRaw, int(c.GetDataSize()+4)); err != nil {
 		return

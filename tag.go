@@ -28,6 +28,10 @@ type TagCompo struct {
 	PreviousTagSize uint32
 }
 
+func (this *TagCompo) Free() {
+	PutBytes(this.TagBodyRaw)
+}
+
 type TagHeader struct {
 	TagType           byte
 	DataSize          []byte
