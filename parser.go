@@ -22,6 +22,12 @@ func NewParser() *Parser {
 	}
 }
 
+func (p *Parser) New() *Parser {
+	return &Parser{
+		stop: make(chan struct{}),
+	}
+}
+
 func (p *Parser) Stop() {
 	p.closeOnce.Do(func() {
 		close(p.stop)
