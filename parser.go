@@ -1,8 +1,6 @@
 package flv
 
 import (
-	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -88,20 +86,22 @@ func (p *Parser) Parse(streamUrl string, out string) (err error) {
 				}
 			}
 
-			if flvBody.ContainAVCSeqHeader() {
-				if p.avcHeader == nil {
-					p.avcHeader = make([]byte, len(flvBody.TagBodyRaw))
-					copy(p.avcHeader, flvBody.TagBodyRaw)
-				} else {
-					if bytes.Compare(p.avcHeader, flvBody.TagBodyRaw) == 0 {
-						flvBody.Free()
-						continue
-					} else {
-						flvBody.Free()
-						return fmt.Errorf("video(name = %s) AVC sequence header changed", out)
-					}
-				}
-			}
+			// // todo(cg): fix video when having a better approach
+			// if flvBody.ContainAVCSeqHeader() {
+			// 	if p.avcHeader == nil {
+			// 		p.avcHeader = make([]byte, len(flvBody.TagBodyRaw))
+			// 		copy(p.avcHeader, flvBody.TagBodyRaw)
+			// 	} else {
+			// 		if bytes.Compare(p.avcHeader, flvBody.TagBodyRaw) == 0 {
+			// 			flvBody.Free()
+			// 			continue
+			// 		} else {
+			// 			flvBody.Free()
+			// 			return fmt.Errorf("video(name = %s) AVC sequence header changed", out)
+			// 		}
+			// 	}
+			// }
+
 			m.WriteTag(flvBody)
 			flvBody.Free()
 		}
